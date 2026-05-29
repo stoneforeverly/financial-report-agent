@@ -1,45 +1,47 @@
+import io
 import markdown as md_lib
-
+from xhtml2pdf import pisa
 
 _CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC&family=Noto+Sans+TC&display=swap');
-
 body {
-    font-family: 'Noto Sans SC', 'Noto Sans TC', Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
     margin: 48px;
     color: #222;
     line-height: 1.7;
-    font-size: 13px;
+    font-size: 11px;
 }
 h1 {
     color: #1a1a2e;
     border-bottom: 2px solid #2c5f8a;
-    padding-bottom: 8px;
-    font-size: 20px;
+    padding-bottom: 6px;
+    font-size: 18px;
 }
 h2 {
     color: #16213e;
-    margin-top: 28px;
-    font-size: 15px;
+    margin-top: 24px;
+    font-size: 13px;
     border-left: 4px solid #2c5f8a;
-    padding-left: 8px;
+    padding-left: 7px;
 }
-em { color: #666; font-size: 12px; }
-p { margin: 8px 0; }
-table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+em { color: #666; font-size: 10px; }
+p  { margin: 5px 0; }
+hr { border-top: 1px solid #ddd; margin: 16px 0; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+th, td { border: 1px solid #ddd; padding: 5px 8px; text-align: left; }
 th { background-color: #f0f4f8; font-weight: bold; }
-hr { border: none; border-top: 1px solid #ddd; margin: 20px 0; }
 """
 
 
 def md_to_pdf(md_text: str) -> bytes:
     html_body = md_lib.markdown(md_text, extensions=["tables", "fenced_code"])
-    html = f"""<!DOCTYPE html>
-<html><head>
-<meta charset="utf-8">
-<style>{_CSS}</style>
-</head><body>{html_body}</body></html>"""
-
-    from weasyprint import HTML
-    return HTML(string=html).write_pdf()
+    html = (
+        "<!DOCTYPE html><html><head>"
+        '<meta charset="utf-8">'
+        f"<style>{_CSS}</style>"
+        f"</head><body>{html_body}</body></html>"
+    )
+    buffer = io.BytesIO()
+    result = pisa.CreatePDF(html, dest=buffer)
+    if result.err:
+        raise RuntimeError(f"PDF generation failed (error code {result.err})")
+    return buffer.getvalue()
