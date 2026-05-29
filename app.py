@@ -226,8 +226,8 @@ if st.session_state.get("report_result"):
                 use_container_width=True,
                 type="primary",
             )
-        except Exception:
-            st.warning(rt["pdf_unavailable"])
+        except Exception as _pdf_err:
+            st.warning(f"{rt['pdf_unavailable']} ({_pdf_err})")
     with col2:
         st.download_button(
             label=rt["download_md"],
