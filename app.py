@@ -217,7 +217,7 @@ if st.session_state.get("report_result"):
     with col1:
         try:
             from utils.pdf_export import md_to_pdf
-            pdf_bytes = md_to_pdf(result["final_report"])
+            pdf_bytes = md_to_pdf(result["final_report"], result["language"])
             st.download_button(
                 label=rt["download_pdf"],
                 data=pdf_bytes,
